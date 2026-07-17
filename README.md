@@ -1,6 +1,6 @@
 # Mini File Sync
 
-Mini File Sync es un programa desarrollado en C para Linux que detecta archivos nuevos o modificados dentro de un directorio de origen y los copia automáticamente hacia un directorio de respaldo.
+Mini File Sync es un programa desarrollado en C para Linux que detecta archivos nuevos dentro de un directorio de origen y los copia automáticamente hacia un directorio de respaldo.
 
 El sistema revisa el directorio cada cinco segundos y utiliza hasta cuatro workers para distribuir las tareas de copia. También registra estadísticas como archivos copiados, bytes transferidos, errores, rendimiento en KB/s y archivos procesados por segundo.
 
