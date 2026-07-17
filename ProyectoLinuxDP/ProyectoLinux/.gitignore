@@ -1,0 +1,14 @@
+# Archivos generados al compilar
+*.o
+minisync
+
+# Archivos comprimidos
+*.zip
+
+# Archivos de prueba
+origen/*
+backup/*
+
+# Conservar las carpetas origen y backup
+!origen/.gitkeep
+!backup/.gitkeep

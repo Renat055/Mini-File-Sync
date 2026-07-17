@@ -1,0 +1,22 @@
+Los programas copian un archivo a otro con diferentes tamanios de bloque
+Miden los tiempos que toma la copia
+Experimentar con diferentes tamanios de bloque: 1, 128, 1024, 2048, 4096, 8192
+
+USO: ./copiarN <archivoORIGEN> <archivoDESTINO> <tamanioBLOQUE>
+
+copiar.c  - sin fsync()
+copiar1.c - con fsync()
+copiar2.c - con fdatasync()
+copiar3.c - solo copia un bloque
+
+------------
+
+The following programs measure the performance of copying big files
+
+USO: ./program <archivoORIGEN> <archivoDESTINO>
+
+bmSTDIO.c - standard I/O
+bmO_DIRECT.c - I/O sin buffering (O_DIRECT)
+bmO_SYNC.c -  I/O syncronizada con disco (O_SYNC)
+bmSENDFILE.c - I/O con sendfile()
+

@@ -1,0 +1,74 @@
+// copia archivo grande (argv[1] => argv[2]) Estandar: con buffering
+// el buffer esta alineado a 4K (FS block size)
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/time.h>
+
+#define BLOCK_SIZE 4096 // Typical file system block size
+
+void timeval_subtract(struct timeval *result, struct timeval *x, struct timeval *y) {
+    // Carry over 1 second if microseconds are negative
+    if (x->tv_usec < y->tv_usec) {
+        int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;
+        y->tv_usec -= 1000000 * nsec;
+        y->tv_sec += nsec;
+    }
+    if (x->tv_usec - y->tv_usec > 1000000) {
+        int nsec = (x->tv_usec - y->tv_usec) / 1000000;
+        y->tv_usec += 1000000 * nsec;
+        y->tv_sec -= nsec;
+    }
+
+    // Compute the actual difference
+    result->tv_sec = x->tv_sec - y->tv_sec;
+    result->tv_usec = x->tv_usec - y->tv_usec;
+}
+
+int main(int argc, char *argv[]) {
+    int fdin, fdout;
+    char *buffer;
+    struct timeval ts, tf, res;
+    ssize_t bytes_read;
+
+    if (argc != 3) {printf ("USO: %s <fnameIN> <fileOUT>\n", argv[0]); exit (1);}
+    
+    fdin = open(argv[1], O_RDONLY);
+    if (fdin < 0) {
+        perror("Error opening fdIN.");
+        return 1;
+    }
+
+    fdout = open(argv[2], O_CREAT | O_TRUNC | O_WRONLY);
+    if (fdout < 0) {
+        perror("Error opening fdOUT.");
+        return 1;
+    }
+
+    if (posix_memalign((void **)&buffer, BLOCK_SIZE, BLOCK_SIZE) != 0) {
+        perror("Failed to allocate aligned memory");
+        close(fdin);
+        close(fdout);
+        return 1;
+    }
+
+    // Clear the buffer
+    memset(buffer, 0, BLOCK_SIZE);
+
+    gettimeofday (&ts, 0);
+    while ((bytes_read = read(fdin, buffer, BLOCK_SIZE)) > 0) {
+        write (fdout, buffer, bytes_read);
+    }
+    gettimeofday (&tf, 0);
+
+    timeval_subtract (&res, &tf, &ts);
+    printf ("%ld secs, %ld usecs\n", res.tv_sec, res.tv_usec);
+
+    close(fdin);
+    close(fdout);
+
+    return 0;
+}
